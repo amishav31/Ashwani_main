@@ -3,38 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LED Wall Configurator</title>
+  <title>LED Wall Configurator with 3D Visualization</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
-      height: 100vh;
-      display: flex;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
     }
 
     .container {
       display: flex;
-      width: 100%;
+      height: 100vh;
     }
 
     .calculator-container {
       width: 40%;
       padding: 20px;
-      background: #fff;
-      border-right: 2px solid #ddd;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+      background-color: #fff;
       overflow-y: auto;
+      border-right: 2px solid #ddd;
+    }
+
+    .tab-container {
+      margin-bottom: 20px;
     }
 
     .tab-button {
-      background-color: #007bff;
-      color: white;
-      border: none;
       padding: 10px 15px;
       margin-right: 10px;
       cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+      border: none;
       border-radius: 5px;
     }
 
@@ -46,32 +51,26 @@
       margin-bottom: 15px;
     }
 
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-
     .form-control {
       padding: 8px;
-      width: 90%;
-      border-radius: 4px;
+      width: 100%;
       border: 1px solid #ccc;
+      border-radius: 5px;
     }
 
     .btn {
+      padding: 10px 20px;
       background-color: #28a745;
       color: white;
       border: none;
-      padding: 10px 20px;
       border-radius: 5px;
       cursor: pointer;
     }
 
     #3d-container {
       width: 60%;
-      background: #e0e0e0;
-      position: relative;
+      height: 100%;
+      background-color: #e0e0e0;
     }
 
     .tab-content {
@@ -81,176 +80,113 @@
     .tab-content.active {
       display: block;
     }
-
-    #screen-size-label {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #333;
-    }
   </style>
 </head>
 <body>
-
-<div class="container">
-  <!-- Calculator Section -->
-  <div class="calculator-container">
-    <h1>LED Wall Configurator</h1>
-
-    <div class="tab-container">
-      <button class="tab-button active" onclick="openTab('indoor')">Indoor</button>
-      <button class="tab-button" onclick="openTab('outdoor')">Outdoor</button>
-    </div>
-
-    <!-- Indoor Tab -->
-    <div id="indoor" class="tab-content active">
-      <div class="form-group">
-        <label for="indoor-length">Room Length (m):</label>
-        <input type="number" id="indoor-length" class="form-control" min="0.1" step="0.1">
+  <div class="container">
+    <!-- Calculator Section -->
+    <div class="calculator-container">
+      <h1>LED Wall Configurator</h1>
+      <div class="tab-container">
+        <button class="tab-button active" onclick="openTab('indoor')">Indoor</button>
+        <button class="tab-button" onclick="openTab('outdoor')">Outdoor</button>
       </div>
-      <div class="form-group">
-        <label for="indoor-width">Room Width (m):</label>
-        <input type="number" id="indoor-width" class="form-control" min="0.1" step="0.1">
-      </div>
-      <div class="form-group">
-        <label for="indoor-height">Room Height (m):</label>
-        <input type="number" id="indoor-height" class="form-control" min="0.1" step="0.1">
-      </div>
-      <div class="form-group">
-        <label for="indoor-cabinet-type">Cabinet Type:</label>
+
+      <div id="indoor" class="tab-content active">
+        <h3>Room Length (m):</h3>
+        <input type="number" id="indoor-length" class="form-control" step="0.1" min="0.1" />
+
+        <h3>Room Width (m):</h3>
+        <input type="number" id="indoor-width" class="form-control" step="0.1" min="0.1" />
+
+        <h3>Room Height (m):</h3>
+        <input type="number" id="indoor-height" class="form-control" step="0.1" min="0.1" />
+
+        <h3>Cabinet Type:</h3>
         <select id="indoor-cabinet-type" class="form-control">
-          <option value="500x500">500x500</option>
-          <option value="500x1000">500x1000</option>
+          <option value="500x500">500×500mm (Standard)</option>
+          <option value="500x1000">500×1000mm</option>
+          <option value="1000x1000">1000×1000mm</option>
         </select>
+
+        <br/><br/>
+        <button class="btn" onclick="calculateIndoor()">Calculate</button>
       </div>
-      <button class="btn" onclick="calculateIndoor()">Calculate</button>
+
+      <div id="outdoor" class="tab-content">
+        <h3>Outdoor feature coming soon...</h3>
+      </div>
     </div>
 
-    <!-- Outdoor Tab -->
-    <div id="outdoor" class="tab-content">
-      <div class="form-group">
-        <label for="outdoor-distance">Viewing Distance:</label>
-        <input type="number" id="outdoor-distance" class="form-control" min="0.1" step="0.1">
-      </div>
-      <div class="form-group">
-        <label for="distance-unit">Unit:</label>
-        <select id="distance-unit" class="form-control">
-          <option value="meters">Meters</option>
-          <option value="feet">Feet</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="outdoor-cabinet-type">Cabinet Type:</label>
-        <select id="outdoor-cabinet-type" class="form-control" onchange="toggleCustomCabinet(this.value)">
-          <option value="500x500">500x500</option>
-          <option value="500x1000">500x1000</option>
-          <option value="custom">Custom</option>
-        </select>
-      </div>
-
-      <div id="custom-cabinet-group" style="display:none;">
-        <div class="form-group">
-          <label for="custom-width">Cabinet Width (mm):</label>
-          <input type="number" id="custom-width" class="form-control" value="500">
-        </div>
-        <div class="form-group">
-          <label for="custom-height">Cabinet Height (mm):</label>
-          <input type="number" id="custom-height" class="form-control" value="500">
-        </div>
-      </div>
-      <button class="btn" onclick="calculateOutdoor()">Calculate</button>
-    </div>
-
-    <div id="screen-size-label"></div>
+    <!-- 3D Visualization Section -->
+    <div id="3d-container"></div>
   </div>
 
-  <!-- 3D Display -->
-  <div id="3d-container"></div>
-</div>
+  <script>
+    let scene, camera, renderer, ledWall;
 
-<script>
-  let scene, camera, renderer, ledWall;
+    function init3D() {
+      const container = document.getElementById('3d-container');
 
-  function init3D() {
-    const container = document.getElementById('3d-container');
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setClearColor(0xf4f4f4);
+      container.appendChild(renderer.domElement);
 
-    const light = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(light);
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(5, 5, 5).normalize();
+      scene.add(light);
 
-    const geometry = new THREE.BoxGeometry(1, 1, 0.1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
-    ledWall = new THREE.Mesh(geometry, material);
-    scene.add(ledWall);
+      const geometry = new THREE.BoxGeometry(1, 1, 0.1);
+      const material = new THREE.MeshStandardMaterial({ color: 0x007bff, metalness: 0.5, roughness: 0.5 });
+      ledWall = new THREE.Mesh(geometry, material);
+      scene.add(ledWall);
 
-    camera.position.z = 5;
-
-    animate();
-  }
-
-  function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
-  }
-
-  function update3DModel(width, height) {
-    ledWall.scale.set(width, height, 0.1);
-    document.getElementById('screen-size-label').innerText = 
-      `LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m`;
-  }
-
-  function calculateIndoor() {
-    const length = parseFloat(document.getElementById('indoor-length').value);
-    const height = parseFloat(document.getElementById('indoor-height').value);
-    if (isNaN(length) || isNaN(height)) return alert('Please enter valid dimensions.');
-    update3DModel(length, height);
-  }
-
-  function calculateOutdoor() {
-    let distance = parseFloat(document.getElementById('outdoor-distance').value);
-    if (isNaN(distance)) return alert('Enter valid viewing distance.');
-
-    const unit = document.getElementById('distance-unit').value;
-    if (unit === 'feet') distance *= 0.3048;
-
-    const cabinetType = document.getElementById('outdoor-cabinet-type').value;
-    let width = 6, height = 3; // default dimensions
-
-    if (cabinetType === 'custom') {
-      width = parseFloat(document.getElementById('custom-width').value) / 1000;
-      height = parseFloat(document.getElementById('custom-height').value) / 1000;
+      camera.position.z = 5;
+      animate();
     }
 
-    update3DModel(width, height);
+    function animate() {
+      requestAnimationFrame(animate);
+      ledWall.rotation.y += 0.01;
+      renderer.render(scene, camera);
+    }
 
-    const pitch = Math.round(distance * 1000) / 1000;
-    document.getElementById('screen-size-label').innerText += `\nRecommended Pixel Pitch: ~${pitch.toFixed(1)}mm`;
-  }
+    function update3DModel(length, height) {
+      length = Math.max(length, 0.5);
+      height = Math.max(height, 0.5);
+      ledWall.scale.set(length, height, 0.1);
 
-  function openTab(tab) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
+      const maxDim = Math.max(length, height);
+      camera.position.z = maxDim * 1.5;
+    }
 
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-  }
+    function calculateIndoor() {
+      const length = parseFloat(document.getElementById('indoor-length').value);
+      const width = parseFloat(document.getElementById('indoor-width').value);
+      const height = parseFloat(document.getElementById('indoor-height').value);
 
-  function toggleCustomCabinet(value) {
-    document.getElementById('custom-cabinet-group').style.display = (value === 'custom') ? 'block' : 'none';
-  }
+      if (!length || !height) {
+        alert("Please enter valid dimensions.");
+        return;
+      }
 
-  window.addEventListener('resize', () => {
-    const container = document.getElementById('3d-container');
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-  });
+      update3DModel(length, height);
+    }
 
-  window.onload = init3D;
-</script>
+    function openTab(tabName) {
+      const tabs = document.querySelectorAll(".tab-content");
+      tabs.forEach(tab => tab.classList.remove("active"));
+      document.getElementById(tabName).classList.add("active");
 
+      const buttons = document.querySelectorAll(".tab-button");
+      buttons.forEach(btn => btn.classList.remove("active"));
+      event.target.classList.add("active");
+    }
+
+    window.onload = init3D;
+  </script>
 </body>
 </html>
