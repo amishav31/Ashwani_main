@@ -174,7 +174,16 @@
   function init3D() {
     const container = document.getElementById('3d-container');
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+
+    camera = new THREE.PerspectiveCamera(
+      75,
+      container.clientWidth / container.clientHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(0, 0, 5);
+    camera.lookAt(0, 0, 0);
+
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
@@ -182,7 +191,9 @@
     const light = new THREE.AmbientLight(0xffffff, 1);
     scene.add(light);
 
-    camera.position.z = 5;
+    // Optional helper to check orientation (can remove later)
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
 
     animate();
   }
@@ -192,38 +203,42 @@
     renderer.render(scene, camera);
   }
 
- function update3DModel(width, height) {
-  if (ledWall) {
-    scene.remove(ledWall);
+  function update3DModel(width, height) {
+    if (ledWall) {
+      scene.remove(ledWall);
+    }
+
+    const geometry = new THREE.BoxGeometry(width, height, 0.1);
+    const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
+    ledWall = new THREE.Mesh(geometry, material);
+    scene.add(ledWall);
+    ledWall.position.set(0, 0, 0);
+
+    // Adjust camera distance based on screen size
+    const maxDim = Math.max(width, height);
+    camera.position.set(0, 0, maxDim * 1.5);
+    camera.lookAt(0, 0, 0);
   }
-
-  const geometry = new THREE.BoxGeometry(width, height, 0.1);
-  const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
-  ledWall = new THREE.Mesh(geometry, material);
-  scene.add(ledWall);
-
-  // Center the wall in 3D space
-  ledWall.position.set(0, 0, 0);
-
-  // Auto-adjust camera to view entire wall properly
-  const maxSize = Math.max(width, height);
-  camera.position.set(0, 0, maxSize * 1.2); // Fixed front view
-  camera.lookAt(0, 0, 0);
-}
-
 
   function calculateIndoor() {
     const length = parseFloat(document.getElementById('indoor-length').value);
     const height = parseFloat(document.getElementById('indoor-height').value);
-    if (isNaN(length) || isNaN(height)) return alert('Please enter valid dimensions.');
+    if (isNaN(length) || isNaN(height)) {
+      alert('Please enter valid dimensions.');
+      return;
+    }
+
     update3DModel(length, height);
-    document.getElementById('screen-size-label').innerText = 
+    document.getElementById('screen-size-label').innerText =
       `LED Wall Size: ${length.toFixed(2)}m × ${height.toFixed(2)}m`;
   }
 
   function calculateOutdoor() {
     let distance = parseFloat(document.getElementById('outdoor-distance').value);
-    if (isNaN(distance)) return alert('Enter valid viewing distance.');
+    if (isNaN(distance)) {
+      alert('Enter valid viewing distance.');
+      return;
+    }
 
     const unit = document.getElementById('distance-unit').value;
     if (unit === 'feet') distance *= 0.3048;
@@ -237,8 +252,8 @@
     }
 
     update3DModel(width, height);
-    document.getElementById('screen-size-label').innerText = 
-      `LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m\nRecommended Pixel Pitch: ~${(distance).toFixed(1)}mm`;
+    document.getElementById('screen-size-label').innerText =
+      `LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m\nRecommended Pixel Pitch: ~${distance.toFixed(1)}mm`;
   }
 
   function openTab(tab, evt) {
@@ -262,6 +277,7 @@
 
   window.onload = init3D;
 </script>
+
 
 </body>
 </html>
