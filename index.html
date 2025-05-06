@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional LED Wall Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .calculator {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+        .notes {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .tab {
+            display: none;
+        }
+        .tab.active {
+            display: block;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .tab-button {
+            padding: 10px 15px;
+            background-color: #eee;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+        .tab-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Professional LED Wall Calculator</h1>
+    
+    <div class="calculator">
+        <div class="tab-buttons">
+            <button class="tab-button active" onclick="openTab('indoor')">Indoor</button>
+            <button class="tab-button" onclick="openTab('outdoor')">Outdoor</button>
+        </div>
+        
+        <div id="indoor" class="tab active">
+            <h2>Indoor LED Wall Calculation</h2>
+            <div class="form-group">
+                <label for="indoor-length">Room Length (meters):</label>
+                <input type="number" id="indoor-length" step="0.1" min="0.1">
+            </div>
+            <div class="form-group">
+                <label for="indoor-width">Room Width (meters):</label>
+                <input type="number" id="indoor-width" step="0.1" min="0.1">
+            </div>
+            <div class="form-group">
+                <label for="indoor-height">Room Height (meters):</label>
+                <input type="number" id="indoor-height" step="0.1" min="0.1">
+            </div>
+            <button onclick="calculateIndoor()">Calculate</button>
+        </div>
+        
+        <div id="outdoor" class="tab">
+            <h2>Outdoor LED Wall Calculation</h2>
+            <div class="form-group">
+                <label for="outdoor-distance">Viewing Distance:</label>
+                <input type="number" id="outdoor-distance" step="0.1" min="0.1">
+            </div>
+            <div class="form-group">
+                <label for="distance-unit">Unit:</label>
+                <select id="distance-unit">
+                    <option value="meters">Meters</option>
+                    <option value="feet">Feet</option>
+                </select>
+            </div>
+            <button onclick="calculateOutdoor()">Calculate</button>
+        </div>
+        
+        <div id="results" class="results"></div>
+    </div>
+    
+    <script>
+        function openTab(tabName) {
+            // Hide all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Deactivate all buttons
+            const buttons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            
+            // Show the selected tab and activate its button
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        function recommendPixelPitch(isIndoor, viewingDistanceMeters) {
+            if (isIndoor) {
+                if (viewingDistanceMeters <= 1.5) return "P1.2-P1.5";
+                if (viewingDistanceMeters <= 3) return "P1.5-P2";
+                if (viewingDistanceMeters <= 6) return "P2-P3";
+                return "P3-P4";
+            }
+            else { // Outdoor
+                if (viewingDistanceMeters <= 5) return "P4-P5";
+                if (viewingDistanceMeters <= 10) return "P5-P6";
+                if (viewingDistanceMeters <= 15) return "P6-P8";
+                return "P8-P10";
+            }
+        }
+        
+        function getStandardPixelPitch(recommendation) {
+            if (recommendation == "P1.2-P1.5") return 1.5;
+            if (recommendation == "P1.5-P2") return 2.0;
+            if (recommendation == "P2-P3") return 2.5;
+            if (recommendation == "P3-P4") return 3.0;
+            if (recommendation == "P4-P5") return 4.0;
+            if (recommendation == "P5-P6") return 5.0;
+            if (recommendation == "P6-P8") return 6.0;
+            if (recommendation == "P8-P10") return 8.0;
+            return 3.0;
+        }
+        
+        function calculateIndoor() {
+            const length = parseFloat(document.getElementById('indoor-length').value);
+            const width = parseFloat(document.getElementById('indoor-width').value);
+            const height = parseFloat(document.getElementById('indoor-height').value);
+            
+            if (isNaN(length) || isNaN(width) || isNaN(height) || length <= 0 || width <= 0 || height <= 0) {
+                alert("Please enter valid positive numbers for all dimensions");
+                return;
+            }
+            
+            // Calculate viewing distance (60% of minimum dimension)
+            const viewingDistance = Math.min(length, width) * 0.6;
+            
+            // Recommend pixel pitch
+            const pixelPitchRec = recommendPixelPitch(true, viewingDistance);
+            const standardPitch = getStandardPixelPitch(pixelPitchRec);
+            
+            // Calculate max possible screen size (leaving 1m clearance)
+            const maxWidth = width - 2.0;
+            const maxHeight = height - 1.0;
+            
+            // Optimal screen size (30° viewing angle)
+            const optimalWidth = 2 * viewingDistance * Math.tan(15 * Math.PI / 180);
+            const optimalHeight = optimalWidth * 9.0 / 16.0;
+            
+            // Use the smaller of optimal or max possible
+            let screenWidth = Math.min(optimalWidth, maxWidth);
+            let screenHeight = Math.min(optimalHeight, maxHeight);
+            
+            // Calculate resolution
+            let horizontalPixels = Math.floor(screenWidth * 1000 / standardPitch);
+            let verticalPixels = Math.floor(screenHeight * 1000 / standardPitch);
+            
+            // Adjust to common module sizes (64x64 pixels)
+            horizontalPixels = Math.floor(horizontalPixels / 64) * 64;
+            verticalPixels = Math.floor(verticalPixels / 64) * 64;
+            
+            // Recalculate actual size
+            screenWidth = horizontalPixels * standardPitch / 1000.0;
+            screenHeight = verticalPixels * standardPitch / 1000.0;
+            
+            // Calculate power (300W/m² for indoor)
+            const powerConsumption = screenWidth * screenHeight * 300.0;
+            const powerSupplySize = powerConsumption * 1.3;
+            
+            // Display results
+            let resultsHTML = `
+                <h2>INDOOR LED WALL SPECIFICATIONS</h2>
+                <p><strong>Viewing Distance:</strong> ${viewingDistance.toFixed(2)} meters</p>
+                <p><strong>Recommended Pixel Pitch:</strong> ${pixelPitchRec}</p>
+                <p><strong>Standard Pitch Used:</strong> ${standardPitch.toFixed(1)} mm</p>
+                
+                <h3>Optimal Screen Size:</h3>
+                <p><strong>Width:</strong> ${screenWidth.toFixed(2)} m</p>
+                <p><strong>Height:</strong> ${screenHeight.toFixed(2)} m</p>
+                <p><strong>Aspect Ratio:</strong> 16:9</p>
+                
+                <h3>Technical Specifications:</h3>
+                <p><strong>Resolution:</strong> ${horizontalPixels} × ${verticalPixels} pixels</p>
+                <p><strong>Power Requirements:</strong> ${powerConsumption.toFixed(0)} W</p>
+                <p><strong>Recommended PSU:</strong> ${powerSupplySize.toFixed(0)} W (with 30% margin)</p>
+                
+                <div class="notes">
+                    <h3>INSTALLATION NOTES:</h3>
+                    <ul>
+                        <li>Minimum brightness: 1500 nits</li>
+                        <li>Leave 1m clearance behind for ventilation</li>
+                        <li>Ambient light control recommended</li>
+                        <li>Maintain room temperature between 15°C and 25°C</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = resultsHTML;
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function calculateOutdoor() {
+            let viewingDistance = parseFloat(document.getElementById('outdoor-distance').value);
+            const unit = document.getElementById('distance-unit').value;
+            
+            if (isNaN(viewingDistance) || viewingDistance <= 0) {
+                alert("Please enter a valid positive number for viewing distance");
+                return;
+            }
+            
+            // Convert to meters if needed
+            if (unit === "feet") {
+                viewingDistance *= 0.3048;
+            }
+            
+            // Recommend pixel pitch
+            const pixelPitchRec = recommendPixelPitch(false, viewingDistance);
+            const standardPitch = getStandardPixelPitch(pixelPitchRec);
+            
+            // Calculate optimal screen height (30° viewing angle)
+            const screenHeight = 2 * viewingDistance * Math.tan(15 * Math.PI / 180);
+            const screenWidth = screenHeight * 16.0 / 9.0;
+            
+            // Calculate resolution
+            let horizontalPixels = Math.floor(screenWidth * 1000 / standardPitch);
+            let verticalPixels = Math.floor(screenHeight * 1000 / standardPitch);
+            
+            // Adjust to common module sizes
+            horizontalPixels = Math.floor(horizontalPixels / 64) * 64;
+            verticalPixels = Math.floor(verticalPixels / 64) * 64;
+            
+            // Recalculate actual size
+            const finalWidth = horizontalPixels * standardPitch / 1000.0;
+            const finalHeight = verticalPixels * standardPitch / 1000.0;
+            
+            // Calculate power (400W/m² for outdoor)
+            const powerConsumption = finalWidth * finalHeight * 400.0;
+            const powerSupplySize = powerConsumption * 1.3;
+            
+            // Display results
+            let resultsHTML = `
+                <h2>OUTDOOR LED WALL SPECIFICATIONS</h2>
+                <p><strong>Viewing Distance:</strong> ${viewingDistance.toFixed(2)} meters</p>
+                <p><strong>Recommended Pixel Pitch:</strong> ${pixelPitchRec}</p>
+                <p><strong>Standard Pitch Used:</strong> ${standardPitch.toFixed(1)} mm</p>
+                
+                <h3>Optimal Screen Size:</h3>
+                <p><strong>Width:</strong> ${finalWidth.toFixed(2)} m</p>
+                <p><strong>Height:</strong> ${finalHeight.toFixed(2)} m</p>
+                <p><strong>Aspect Ratio:</strong> 16:9</p>
+                
+                <h3>Technical Specifications:</h3>
+                <p><strong>Resolution:</strong> ${horizontalPixels} × ${verticalPixels} pixels</p>
+                <p><strong>Power Requirements:</strong> ${powerConsumption.toFixed(0)} W</p>
+                <p><strong>Recommended PSU:</strong> ${powerSupplySize.toFixed(0)} W (with 30% margin)</p>
+                
+                <div class="notes">
+                    <h3>INSTALLATION NOTES:</h3>
+                    <ul>
+                        <li>Minimum brightness: 5000 nits (recommended 7000+ for sunny locations)</li>
+                        <li>Requires IP65 or higher weatherproof rating</li>
+                        <li>Consider sunlight reflection in placement</li>
+                        <li>Include drainage in mounting structure</li>
+                        <li>Allow for thermal expansion in mounting design</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('results').innerHTML = resultsHTML;
+            document.getElementById('results').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
