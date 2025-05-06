@@ -83,7 +83,6 @@
 </head>
 <body>
 <div class="container">
-  <!-- Config Section -->
   <div class="calculator-container">
     <h1>LED Wall Configurator</h1>
 
@@ -129,7 +128,6 @@
     <div id="screen-size-label"></div>
   </div>
 
-  <!-- 3D Display -->
   <div id="3d-container">
     <div id="dimension-overlay"></div>
   </div>
@@ -139,63 +137,61 @@
   let scene, camera, renderer, ledWall;
 
   function init3D() {
-  const container = document.getElementById('3d-container');
-  scene = new THREE.Scene();
+    const container = document.getElementById('3d-container');
+    scene = new THREE.Scene();
 
-  const aspect = container.clientWidth / container.clientHeight;
-  camera = new THREE.OrthographicCamera(-aspect * 5, aspect * 5, 5, -5, 1, 100);
-  camera.position.z = 10;
+    const aspect = container.clientWidth / container.clientHeight;
+    camera = new THREE.OrthographicCamera(-aspect * 5, aspect * 5, 5, -5, 1, 100);
+    camera.position.z = 10;
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  container.appendChild(renderer.domElement);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement); // Append first
 
-  const light = new THREE.AmbientLight(0xffffff, 1);
-  scene.add(light);
+    const light = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(light);
 
-  renderScreen(); // 🔥 Add this line so the screen is created immediately
-  animate();
-}
+    renderScreen(); // Then render screen
+    animate();
+  }
 
   function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
   }
 
- function renderScreen() {
-  const width = parseFloat(document.getElementById('width').value);
-  const height = parseFloat(document.getElementById('height').value);
-  const pitch = parseFloat(document.getElementById('pixel-pitch').value);
+  function renderScreen() {
+    const width = parseFloat(document.getElementById('width').value);
+    const height = parseFloat(document.getElementById('height').value);
+    const pitch = parseFloat(document.getElementById('pixel-pitch').value);
 
-  if (ledWall) scene.remove(ledWall);
+    if (ledWall) scene.remove(ledWall);
 
-  // Create screen
-  const geometry = new THREE.BoxGeometry(width, height, 0.2);
-  const material = new THREE.MeshBasicMaterial({ color: 0x0033aa });
-  ledWall = new THREE.Mesh(geometry, material);
-  scene.add(ledWall);
+    const geometry = new THREE.BoxGeometry(width, height, 0.2);
+    const material = new THREE.MeshBasicMaterial({ color: 0x0033aa });
+    ledWall = new THREE.Mesh(geometry, material);
+    scene.add(ledWall);
 
-  // Adjust camera to fit screen
-  const container = document.getElementById('3d-container');
-  const aspect = container.clientWidth / container.clientHeight;
-  const margin = 1.2; // add margin so it's not tight
+    // Adjust camera
+    const container = document.getElementById('3d-container');
+    const aspect = container.clientWidth / container.clientHeight;
+    const margin = 1.2;
 
-  const viewSize = Math.max(width, height) * margin;
+    const viewSize = Math.max(width, height) * margin;
 
-  camera.left = -aspect * viewSize / 2;
-  camera.right = aspect * viewSize / 2;
-  camera.top = viewSize / 2;
-  camera.bottom = -viewSize / 2;
-  camera.updateProjectionMatrix();
+    camera.left = -aspect * viewSize / 2;
+    camera.right = aspect * viewSize / 2;
+    camera.top = viewSize / 2;
+    camera.bottom = -viewSize / 2;
+    camera.updateProjectionMatrix();
 
-  // Labels
-  document.getElementById('screen-size-label').innerText =
-    `LED Wall Size: ${width.toFixed(2)}m x ${height.toFixed(2)}m | Pixel Pitch: ${pitch.toFixed(1)}mm`;
+    // Labels
+    document.getElementById('screen-size-label').innerText =
+      `LED Wall Size: ${width.toFixed(2)}m x ${height.toFixed(2)}m | Pixel Pitch: ${pitch.toFixed(1)}mm`;
 
-  document.getElementById('dimension-overlay').innerText =
-    `${width.toFixed(2)}m × ${height.toFixed(2)}m`;
-}
-
+    document.getElementById('dimension-overlay').innerText =
+      `${width.toFixed(2)}m × ${height.toFixed(2)}m`;
+  }
 
   window.onload = init3D;
 </script>
