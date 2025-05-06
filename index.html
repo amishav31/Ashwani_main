@@ -139,22 +139,23 @@
   let scene, camera, renderer, ledWall;
 
   function init3D() {
-    const container = document.getElementById('3d-container');
-    scene = new THREE.Scene();
+  const container = document.getElementById('3d-container');
+  scene = new THREE.Scene();
 
-    const aspect = container.clientWidth / container.clientHeight;
-    camera = new THREE.OrthographicCamera(-aspect * 5, aspect * 5, 5, -5, 1, 100);
-    camera.position.z = 10;
+  const aspect = container.clientWidth / container.clientHeight;
+  camera = new THREE.OrthographicCamera(-aspect * 5, aspect * 5, 5, -5, 1, 100);
+  camera.position.z = 10;
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
 
-    const light = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(light);
+  const light = new THREE.AmbientLight(0xffffff, 1);
+  scene.add(light);
 
-    animate();
-  }
+  renderScreen(); // 🔥 Add this line so the screen is created immediately
+  animate();
+}
 
   function animate() {
     requestAnimationFrame(animate);
