@@ -1,206 +1,255 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LED Wall Calculator with 3D Visualization</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
-        }
-        .container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-        .calculator-container {
-            width: 50%;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            border-right: 2px solid #ddd;
-        }
-        .tab-container {
-            margin-bottom: 20px;
-        }
-        .tab-button {
-            padding: 10px;
-            margin: 5px;
-            cursor: pointer;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        .tab-button.active {
-            background-color: #0056b3;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-control {
-            padding: 8px;
-            width: 200px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .btn {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #3d-container {
-            width: 50%;
-            background-color: #e0e0e0;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LED Wall Configurator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      height: 100vh;
+      display: flex;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+    }
+
+    .calculator-container {
+      width: 40%;
+      padding: 20px;
+      background: #fff;
+      border-right: 2px solid #ddd;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+      overflow-y: auto;
+    }
+
+    .tab-button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-right: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .tab-button.active {
+      background-color: #0056b3;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .form-control {
+      padding: 8px;
+      width: 90%;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .btn {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #3d-container {
+      width: 60%;
+      background: #e0e0e0;
+      position: relative;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    #screen-size-label {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Calculator Section -->
-    <div class="calculator-container">
-        <h1>LED Wall Calculator with 3D Visualization</h1>
-        <div class="tab-container">
-            <button class="tab-button active" onclick="openTab('indoor')">Indoor</button>
-            <button class="tab-button" onclick="openTab('outdoor')">Outdoor</button>
-        </div>
+  <!-- Calculator Section -->
+  <div class="calculator-container">
+    <h1>LED Wall Configurator</h1>
 
-        <div id="indoor" class="tab-content active">
-            <h2>Indoor LED Wall Calculation</h2>
-            <div class="form-group">
-                <label for="indoor-length">Room Length (meters):</label>
-                <input type="number" id="indoor-length" class="form-control" step="0.1" min="0.1">
-            </div>
-            <div class="form-group">
-                <label for="indoor-width">Room Width (meters):</label>
-                <input type="number" id="indoor-width" class="form-control" step="0.1" min="0.1">
-            </div>
-            <div class="form-group">
-                <label for="indoor-height">Room Height (meters):</label>
-                <input type="number" id="indoor-height" class="form-control" step="0.1" min="0.1">
-            </div>
-            <div class="form-group">
-                <label for="indoor-cabinet-type">Preferred Cabinet Type:</label>
-                <select id="indoor-cabinet-type" class="form-control select-control">
-                    <option value="500x500">500×500mm (Standard)</option>
-                    <option value="500x1000">500×1000mm</option>
-                    <option value="1000x1000">1000×1000mm</option>
-                </select>
-            </div>
-            <button class="btn" onclick="calculateIndoor()">Calculate</button>
-        </div>
-
-        <div id="outdoor" class="tab-content">
-            <h2>Outdoor LED Wall Calculation</h2>
-            <div class="form-group">
-                <label for="outdoor-distance">Viewing Distance:</label>
-                <input type="number" id="outdoor-distance" class="form-control" step="0.1" min="0.1">
-            </div>
-            <div class="form-group">
-                <label for="distance-unit">Unit:</label>
-                <select id="distance-unit" class="form-control select-control">
-                    <option value="meters">Meters</option>
-                    <option value="feet">Feet</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="outdoor-cabinet-type">Preferred Cabinet Type:</label>
-                <select id="outdoor-cabinet-type" class="form-control select-control">
-                    <option value="500x500">500×500mm (Standard)</option>
-                    <option value="500x1000">500×1000mm</option>
-                    <option value="1000x1000">1000×1000mm (Weatherproof)</option>
-                    <option value="custom">Custom Size</option>
-                </select>
-            </div>
-            <div id="custom-cabinet-group" style="display: none;">
-                <div class="form-group">
-                    <label for="custom-width">Cabinet Width (mm):</label>
-                    <input type="number" id="custom-width" class="form-control" min="100" step="10" value="500">
-                </div>
-                <div class="form-group">
-                    <label for="custom-height">Cabinet Height (mm):</label>
-                    <input type="number" id="custom-height" class="form-control" min="100" step="10" value="500">
-                </div>
-            </div>
-            <button class="btn" onclick="calculateOutdoor()">Calculate</button>
-        </div>
-
-        <div id="results" class="results-container"></div>
+    <div class="tab-container">
+      <button class="tab-button active" onclick="openTab('indoor')">Indoor</button>
+      <button class="tab-button" onclick="openTab('outdoor')">Outdoor</button>
     </div>
 
-    <!-- 3D Visualization Section -->
-    <div id="3d-container"></div>
+    <!-- Indoor Tab -->
+    <div id="indoor" class="tab-content active">
+      <div class="form-group">
+        <label for="indoor-length">Room Length (m):</label>
+        <input type="number" id="indoor-length" class="form-control" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label for="indoor-width">Room Width (m):</label>
+        <input type="number" id="indoor-width" class="form-control" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label for="indoor-height">Room Height (m):</label>
+        <input type="number" id="indoor-height" class="form-control" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label for="indoor-cabinet-type">Cabinet Type:</label>
+        <select id="indoor-cabinet-type" class="form-control">
+          <option value="500x500">500x500</option>
+          <option value="500x1000">500x1000</option>
+        </select>
+      </div>
+      <button class="btn" onclick="calculateIndoor()">Calculate</button>
+    </div>
+
+    <!-- Outdoor Tab -->
+    <div id="outdoor" class="tab-content">
+      <div class="form-group">
+        <label for="outdoor-distance">Viewing Distance:</label>
+        <input type="number" id="outdoor-distance" class="form-control" min="0.1" step="0.1">
+      </div>
+      <div class="form-group">
+        <label for="distance-unit">Unit:</label>
+        <select id="distance-unit" class="form-control">
+          <option value="meters">Meters</option>
+          <option value="feet">Feet</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="outdoor-cabinet-type">Cabinet Type:</label>
+        <select id="outdoor-cabinet-type" class="form-control" onchange="toggleCustomCabinet(this.value)">
+          <option value="500x500">500x500</option>
+          <option value="500x1000">500x1000</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div id="custom-cabinet-group" style="display:none;">
+        <div class="form-group">
+          <label for="custom-width">Cabinet Width (mm):</label>
+          <input type="number" id="custom-width" class="form-control" value="500">
+        </div>
+        <div class="form-group">
+          <label for="custom-height">Cabinet Height (mm):</label>
+          <input type="number" id="custom-height" class="form-control" value="500">
+        </div>
+      </div>
+      <button class="btn" onclick="calculateOutdoor()">Calculate</button>
+    </div>
+
+    <div id="screen-size-label"></div>
+  </div>
+
+  <!-- 3D Display -->
+  <div id="3d-container"></div>
 </div>
 
 <script>
-    let scene, camera, renderer, ledWall;
+  let scene, camera, renderer, ledWall;
 
-    function init3D() {
-        scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        renderer = new THREE.WebGLRenderer();
-        renderer.setSize(600, 400);
-        document.getElementById('3d-container').appendChild(renderer.domElement);
+  function init3D() {
+    const container = document.getElementById('3d-container');
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
 
-        // Create the LED wall mesh
-        let geometry = new THREE.BoxGeometry(1, 1, 0.1);
-        let material = new THREE.MeshBasicMaterial({ color: 0x007bff, wireframe: true });
-        ledWall = new THREE.Mesh(geometry, material);
-        scene.add(ledWall);
+    const light = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(light);
 
-        camera.position.z = 5;
-        animate();
+    const geometry = new THREE.BoxGeometry(1, 1, 0.1);
+    const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
+    ledWall = new THREE.Mesh(geometry, material);
+    scene.add(ledWall);
+
+    camera.position.z = 5;
+
+    animate();
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+
+  function update3DModel(width, height) {
+    ledWall.scale.set(width, height, 0.1);
+    document.getElementById('screen-size-label').innerText = 
+      `LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m`;
+  }
+
+  function calculateIndoor() {
+    const length = parseFloat(document.getElementById('indoor-length').value);
+    const height = parseFloat(document.getElementById('indoor-height').value);
+    if (isNaN(length) || isNaN(height)) return alert('Please enter valid dimensions.');
+    update3DModel(length, height);
+  }
+
+  function calculateOutdoor() {
+    let distance = parseFloat(document.getElementById('outdoor-distance').value);
+    if (isNaN(distance)) return alert('Enter valid viewing distance.');
+
+    const unit = document.getElementById('distance-unit').value;
+    if (unit === 'feet') distance *= 0.3048;
+
+    const cabinetType = document.getElementById('outdoor-cabinet-type').value;
+    let width = 6, height = 3; // default dimensions
+
+    if (cabinetType === 'custom') {
+      width = parseFloat(document.getElementById('custom-width').value) / 1000;
+      height = parseFloat(document.getElementById('custom-height').value) / 1000;
     }
 
-    function animate() {
-        requestAnimationFrame(animate);
-        renderer.render(scene, camera);
-    }
+    update3DModel(width, height);
 
-    function update3DModel(length, width, height) {
-        // Update the LED wall size based on the input values
-        ledWall.scale.set(length, height, 0.1);  // Adjust based on your measurements
-    }
+    const pitch = Math.round(distance * 1000) / 1000;
+    document.getElementById('screen-size-label').innerText += `\nRecommended Pixel Pitch: ~${pitch.toFixed(1)}mm`;
+  }
 
-    // Add event listeners to update the 3D model on user input
-    function calculateIndoor() {
-        let length = parseFloat(document.getElementById('indoor-length').value);
-        let width = parseFloat(document.getElementById('indoor-width').value);
-        let height = parseFloat(document.getElementById('indoor-height').value);
+  function openTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
 
-        update3DModel(length, width, height);
-    }
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+  }
 
-    function openTab(tabName) {
-        // Switch tabs
-        let indoorTab = document.getElementById('indoor');
-        let outdoorTab = document.getElementById('outdoor');
-        
-        if (tabName === 'indoor') {
-            indoorTab.style.display = 'block';
-            outdoorTab.style.display = 'none';
-        } else {
-            indoorTab.style.display = 'none';
-            outdoorTab.style.display = 'block';
-        }
-    }
+  function toggleCustomCabinet(value) {
+    document.getElementById('custom-cabinet-group').style.display = (value === 'custom') ? 'block' : 'none';
+  }
 
-    // Initialize the 3D scene when the page loads
-    window.onload = init3D;
+  window.addEventListener('resize', () => {
+    const container = document.getElementById('3d-container');
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+
+  window.onload = init3D;
 </script>
 
 </body>
