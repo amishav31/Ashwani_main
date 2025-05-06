@@ -169,7 +169,7 @@
 </div>
 
 <script>
-  let scene, renderer, ledWall;
+  let scene, renderer, ledWall, camera;
 
   function init3D() {
     const container = document.getElementById('3d-container');
@@ -178,6 +178,11 @@
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
+
+    // Orthographic Camera (stable 2D-like view)
+    const aspect = container.clientWidth / container.clientHeight;
+    camera = new THREE.OrthographicCamera(-aspect * 5, aspect * 5, 5, -5, 1, 1000);
+    camera.position.z = 10;
 
     // Lighting
     const light = new THREE.AmbientLight(0xffffff, 1);
@@ -188,7 +193,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
-    renderer.render(scene, new THREE.OrthographicCamera(-10, 10, 10, -10, 1, 1000));
+    renderer.render(scene, camera);
   }
 
   function update3DModel(width, height) {
@@ -199,8 +204,8 @@
     const geometry = new THREE.BoxGeometry(width, height, 0.1);
     const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
     ledWall = new THREE.Mesh(geometry, material);
-    scene.add(ledWall);
     ledWall.position.set(0, 0, 0);
+    scene.add(ledWall);
   }
 
   function calculateIndoor() {
@@ -213,7 +218,7 @@
 
     update3DModel(length, height);
     document.getElementById('screen-size-label').innerText =
-      LED Wall Size: ${length.toFixed(2)}m × ${height.toFixed(2)}m;
+      `LED Wall Size: ${length.toFixed(2)}m × ${height.toFixed(2)}m`;
   }
 
   function calculateOutdoor() {
@@ -236,7 +241,7 @@
 
     update3DModel(width, height);
     document.getElementById('screen-size-label').innerText =
-      LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m\nRecommended Pixel Pitch: ~${distance.toFixed(1)}mm;
+      `LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m\nRecommended Pixel Pitch: ~${distance.toFixed(1)}mm`;
   }
 
   function openTab(tab, evt) {
@@ -258,7 +263,6 @@
 
   window.onload = init3D;
 </script>
-
 
 </body>
 </html>
