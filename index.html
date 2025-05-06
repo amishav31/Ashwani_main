@@ -192,19 +192,25 @@
     renderer.render(scene, camera);
   }
 
-  function update3DModel(width, height) {
-    if (ledWall) {
-      scene.remove(ledWall);
-    }
-
-    const geometry = new THREE.BoxGeometry(width, height, 0.1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
-    ledWall = new THREE.Mesh(geometry, material);
-    scene.add(ledWall);
-
-    // Adjust camera based on size
-    camera.position.z = Math.max(width, height) * 1.5;
+ function update3DModel(width, height) {
+  if (ledWall) {
+    scene.remove(ledWall);
   }
+
+  const geometry = new THREE.BoxGeometry(width, height, 0.1);
+  const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
+  ledWall = new THREE.Mesh(geometry, material);
+  scene.add(ledWall);
+
+  // Center the wall in 3D space
+  ledWall.position.set(0, 0, 0);
+
+  // Auto-adjust camera to view entire wall properly
+  const maxSize = Math.max(width, height);
+  camera.position.set(0, 0, maxSize * 1.2); // Fixed front view
+  camera.lookAt(0, 0, 0);
+}
+
 
   function calculateIndoor() {
     const length = parseFloat(document.getElementById('indoor-length').value);
