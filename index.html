@@ -161,34 +161,40 @@
     renderer.render(scene, camera);
   }
 
-  function renderScreen() {
-    const width = parseFloat(document.getElementById('width').value);
-    const height = parseFloat(document.getElementById('height').value);
-    const distance = parseFloat(document.getElementById('viewing-distance').value);
-    const pitch = parseFloat(document.getElementById('pixel-pitch').value);
+ function renderScreen() {
+  const width = parseFloat(document.getElementById('width').value);
+  const height = parseFloat(document.getElementById('height').value);
+  const pitch = parseFloat(document.getElementById('pixel-pitch').value);
 
-    if (ledWall) scene.remove(ledWall);
+  if (ledWall) scene.remove(ledWall);
 
-    const geometry = new THREE.BoxGeometry(width, height, 0.2);
-    const material = new THREE.MeshBasicMaterial({ color: 0x0033aa });
-    ledWall = new THREE.Mesh(geometry, material);
-    scene.add(ledWall);
+  // Create screen
+  const geometry = new THREE.BoxGeometry(width, height, 0.2);
+  const material = new THREE.MeshBasicMaterial({ color: 0x0033aa });
+  ledWall = new THREE.Mesh(geometry, material);
+  scene.add(ledWall);
 
-    document.getElementById('screen-size-label').innerText =
-      `LED Wall Size: ${width.toFixed(2)}m x ${height.toFixed(2)}m | Pixel Pitch: ${pitch.toFixed(1)}mm`;
+  // Adjust camera to fit screen
+  const container = document.getElementById('3d-container');
+  const aspect = container.clientWidth / container.clientHeight;
+  const margin = 1.2; // add margin so it's not tight
 
-    document.getElementById('dimension-overlay').innerText =
-      `${width.toFixed(2)}m × ${height.toFixed(2)}m`;
-  }
+  const viewSize = Math.max(width, height) * margin;
 
-  window.addEventListener('resize', () => {
-    const container = document.getElementById('3d-container');
-    const aspect = container.clientWidth / container.clientHeight;
-    camera.left = -aspect * 5;
-    camera.right = aspect * 5;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-  });
+  camera.left = -aspect * viewSize / 2;
+  camera.right = aspect * viewSize / 2;
+  camera.top = viewSize / 2;
+  camera.bottom = -viewSize / 2;
+  camera.updateProjectionMatrix();
+
+  // Labels
+  document.getElementById('screen-size-label').innerText =
+    `LED Wall Size: ${width.toFixed(2)}m x ${height.toFixed(2)}m | Pixel Pitch: ${pitch.toFixed(1)}mm`;
+
+  document.getElementById('dimension-overlay').innerText =
+    `${width.toFixed(2)}m × ${height.toFixed(2)}m`;
+}
+
 
   window.onload = init3D;
 </script>
