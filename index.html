@@ -70,6 +70,7 @@
 
     #3d-container {
       width: 60%;
+      height: 100vh;
       background: #e0e0e0;
       position: relative;
     }
@@ -97,8 +98,8 @@
     <h1>LED Wall Configurator</h1>
 
     <div class="tab-container">
-      <button class="tab-button active" onclick="openTab('indoor')">Indoor</button>
-      <button class="tab-button" onclick="openTab('outdoor')">Outdoor</button>
+      <button class="tab-button active" onclick="openTab('indoor', event)">Indoor</button>
+      <button class="tab-button" onclick="openTab('outdoor', event)">Outdoor</button>
     </div>
 
     <!-- Indoor Tab -->
@@ -181,11 +182,6 @@
     const light = new THREE.AmbientLight(0xffffff, 1);
     scene.add(light);
 
-    const geometry = new THREE.BoxGeometry(1, 1, 0.1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
-    ledWall = new THREE.Mesh(geometry, material);
-    scene.add(ledWall);
-
     camera.position.z = 5;
 
     animate();
@@ -197,9 +193,17 @@
   }
 
   function update3DModel(width, height) {
-    ledWall.scale.set(width, height, 0.1);
-    document.getElementById('screen-size-label').innerText = 
-      `LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m`;
+    if (ledWall) {
+      scene.remove(ledWall);
+    }
+
+    const geometry = new THREE.BoxGeometry(width, height, 0.1);
+    const material = new THREE.MeshBasicMaterial({ color: 0x007bff });
+    ledWall = new THREE.Mesh(geometry, material);
+    scene.add(ledWall);
+
+    // Adjust camera based on size
+    camera.position.z = Math.max(width, height) * 1.5;
   }
 
   function calculateIndoor() {
@@ -207,6 +211,8 @@
     const height = parseFloat(document.getElementById('indoor-height').value);
     if (isNaN(length) || isNaN(height)) return alert('Please enter valid dimensions.');
     update3DModel(length, height);
+    document.getElementById('screen-size-label').innerText = 
+      `LED Wall Size: ${length.toFixed(2)}m × ${height.toFixed(2)}m`;
   }
 
   function calculateOutdoor() {
@@ -217,7 +223,7 @@
     if (unit === 'feet') distance *= 0.3048;
 
     const cabinetType = document.getElementById('outdoor-cabinet-type').value;
-    let width = 6, height = 3; // default dimensions
+    let width = 6, height = 3;
 
     if (cabinetType === 'custom') {
       width = parseFloat(document.getElementById('custom-width').value) / 1000;
@@ -225,17 +231,16 @@
     }
 
     update3DModel(width, height);
-
-    const pitch = Math.round(distance * 1000) / 1000;
-    document.getElementById('screen-size-label').innerText += `\nRecommended Pixel Pitch: ~${pitch.toFixed(1)}mm`;
+    document.getElementById('screen-size-label').innerText = 
+      `LED Wall Size: ${width.toFixed(2)}m × ${height.toFixed(2)}m\nRecommended Pixel Pitch: ~${(distance).toFixed(1)}mm`;
   }
 
-  function openTab(tab) {
+  function openTab(tab, evt) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.getElementById(tab).classList.add('active');
 
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    evt.target.classList.add('active');
   }
 
   function toggleCustomCabinet(value) {
