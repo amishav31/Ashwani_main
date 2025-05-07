@@ -1,4 +1,4 @@
-function showToast(message) {
+function showToast(message, duration = 3000) {
   const toast = document.getElementById("toast");
   toast.textContent = message;
   toast.classList.remove("opacity-0");
@@ -7,7 +7,7 @@ function showToast(message) {
   setTimeout(() => {
     toast.classList.remove("opacity-100");
     toast.classList.add("opacity-0");
-  }, 3000);
+  }, duration);
 }
 
 function calculate() {
@@ -16,31 +16,44 @@ function calculate() {
   const pixelPitch = parseFloat(document.getElementById('pixelPitch').value);
   const cabinetSize = document.getElementById('cabinetSize').value;
 
-  if (!widthFt || !heightFt || !pixelPitch || !cabinetSize) {
-    showToast("Please fill in all fields (Width, Height, Pixel Pitch, Cabinet Size).");
+  if (isNaN(widthFt) || isNaN(heightFt) || isNaN(pixelPitch) || !cabinetSize) {
+    showToast("Please enter valid values for all fields.");
     return;
   }
 
-  // Convert feet to millimeters
+  if (widthFt <= 0 || heightFt <= 0 || pixelPitch <= 0) {
+    showToast("Values must be greater than zero.");
+    return;
+  }
+
+  const [cabinetW, cabinetH] = cabinetSize.split('x').map(Number);
+  if (isNaN(cabinetW) || isNaN(cabinetH) || cabinetW <= 0 || cabinetH <= 0) {
+    showToast("Invalid cabinet size.");
+    return;
+  }
+
+  // Convert feet to mm
   const widthMm = widthFt * 304.8;
   const heightMm = heightFt * 304.8;
 
-  // Pixel calculations
+  // Pixel resolution
   const widthPx = Math.floor(widthMm / pixelPitch);
   const heightPx = Math.floor(heightMm / pixelPitch);
   const totalPixels = widthPx * heightPx;
-  const aspectRatio = `${widthPx}:${heightPx}`;
 
-  // Cabinet layout calculations
-  const [cabinetW, cabinetH] = cabinetSize.split('x').map(Number);
+  // Calculate aspect ratio (rounded to nearest integer ratio)
+  const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
+  const divisor = gcd(widthPx, heightPx);
+  const aspectRatio = `${Math.round(widthPx / divisor)}:${Math.round(heightPx / divisor)}`;
+
+  // Cabinet layout
   const cabinetsHoriz = Math.ceil(widthMm / cabinetW);
   const cabinetsVert = Math.ceil(heightMm / cabinetH);
   const totalCabinets = cabinetsHoriz * cabinetsVert;
 
-  // Cabinet layout preview
+  // Cabinet preview
   const cabinetPreview = document.getElementById('cabinetPreview');
   cabinetPreview.innerHTML = '';
-  cabinetPreview.className = 'grid gap-1';
   cabinetPreview.style.gridTemplateColumns = `repeat(${cabinetsHoriz}, minmax(0, 1fr))`;
 
   for (let i = 0; i < totalCabinets; i++) {
@@ -50,11 +63,11 @@ function calculate() {
     cabinetPreview.appendChild(div);
   }
 
-  // Power calculation
+  // Power consumption (Wattage)
   const powerPerCabinet = 160;
   const totalPower = totalCabinets * powerPerCabinet;
 
-  // Resolution tier
+  // Resolution tier classification
   let resolutionTier = '';
   if (totalPixels < 921600) {
     resolutionTier = 'SD (Standard Definition)';
@@ -68,26 +81,24 @@ function calculate() {
     resolutionTier = '8K UHD';
   }
 
-  // Display results with fade-in animation
+  // Display results
   const resultDiv = document.getElementById('result');
-  resultDiv.style.opacity = '0'; // reset
+  resultDiv.style.opacity = '0';
   resultDiv.innerHTML = `
     <h2 class="text-xl font-semibold mb-2">Results</h2>
     <ul class="space-y-1 text-sm">
-      <li><strong>Width:</strong> ${widthPx} px</li>
-      <li><strong>Height:</strong> ${heightPx} px</li>
+      <li><strong>Width:</strong> ${widthPx.toLocaleString()} px</li>
+      <li><strong>Height:</strong> ${heightPx.toLocaleString()} px</li>
       <li><strong>Total Pixels:</strong> ${totalPixels.toLocaleString()}</li>
       <li><strong>Aspect Ratio:</strong> ${aspectRatio}</li>
       <hr class="my-2"/>
-      <li><strong>Cabinets (WxH):</strong> ${cabinetW}mm x ${cabinetH}mm</li>
-      <li><strong>Cabinet Layout:</strong> ${cabinetsHoriz} x ${cabinetsVert}</li>
+      <li><strong>Cabinet Size:</strong> ${cabinetW} mm x ${cabinetH} mm</li>
+      <li><strong>Layout (H × V):</strong> ${cabinetsHoriz} × ${cabinetsVert}</li>
       <li><strong>Total Cabinets:</strong> ${totalCabinets}</li>
-      <li><strong>Estimated Power Consumption:</strong> ${totalPower} W</li>
+      <li><strong>Estimated Power Usage:</strong> ${totalPower} W</li>
       <li><strong>Resolution Tier:</strong> ${resolutionTier}</li>
     </ul>
   `;
-
-  // Animate fade-in
   setTimeout(() => {
     resultDiv.style.opacity = '1';
   }, 50);
