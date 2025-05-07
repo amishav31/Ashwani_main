@@ -1,56 +1,29 @@
-const indoorCabinetSize = 576; // in mm
-const outdoorCabinetSize = 960; // in mm
-
-document.getElementById("type").addEventListener("change", function() {
-    const type = this.value;
-    const pixelInput = document.getElementById("pixel");
-    if (type === "indoor") {
-        pixelInput.placeholder = "P1.8 - P4";
-        pixelInput.disabled = false;
-    } else {
-        pixelInput.placeholder = "P5 - P10";
-        pixelInput.disabled = false;
-    }
-});
-
 function calculate() {
-    const length = parseInt(document.getElementById("length").value);
-    const width = parseInt(document.getElementById("width").value);
-    const type = document.getElementById("type").value;
-    const pixelPitch = parseFloat(document.getElementById("pixel").value);
+  const widthFt = parseFloat(document.getElementById('width').value);
+  const heightFt = parseFloat(document.getElementById('height').value);
+  const pixelPitch = parseFloat(document.getElementById('pixelPitch').value);
 
-    let cabinetSize, viewingDistance;
+  if (!widthFt || !heightFt) {
+    alert("Please enter both width and height.");
+    return;
+  }
 
-    if (type === "indoor") {
-        cabinetSize = indoorCabinetSize;
-        viewingDistance = 3;
-    } else {
-        cabinetSize = outdoorCabinetSize;
-        viewingDistance = 10;
-   }
+  // Convert ft to mm (1 ft = 304.8 mm)
+  const widthMm = widthFt * 304.8;
+  const heightMm = heightFt * 304.8;
 
-    const totalArea = length * width;
-    const cabinetArea = cabinetSize * cabinetSize;
-    const totalCabinets = Math.ceil(totalArea / cabinetArea);
+  // Calculate resolution
+  const widthPx = Math.floor(widthMm / pixelPitch);
+  const heightPx = Math.floor(heightMm / pixelPitch);
+  const totalPixels = widthPx * heightPx;
 
-    document.getElementById("total-cabinets").innerText = totalCabinets;
-    document.getElementById("total-area").innerText = totalArea + " mm²";
-
-    createPreview(totalCabinets, length, width, cabinetSize);
-}
-
-function createPreview(cabinets, length, width, cabinetSize) {
-    let previewDiv = document.getElementById("preview");
-    previewDiv.innerHTML = '';
-
-    const rows = Math.ceil(length / cabinetSize);
-    const cols = Math.ceil(width / cabinetSize);
-
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            const div = document.createElement("div");
-            div.className = "cabinet";
-            previewDiv.appendChild(div);
-        }
-    }
+  // Display the result
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = `
+    <h2>Results</h2>
+    <p><strong>Width:</strong> ${widthPx} px</p>
+    <p><strong>Height:</strong> ${heightPx} px</p>
+    <p><strong>Total Pixels:</strong> ${totalPixels.toLocaleString()}</p>
+    <p><strong>Aspect Ratio:</strong> ${widthPx}:${heightPx}</p>
+  `;
 }
