@@ -25,22 +25,21 @@ function calculate() {
   const cabinetsVert = Math.ceil(heightMm / cabinetH);
   const totalCabinets = cabinetsHoriz * cabinetsVert;
 
-  // Preview Grid
+  // Cabinet layout preview
   const cabinetPreview = document.getElementById('cabinetPreview');
   cabinetPreview.innerHTML = '';
-  cabinetPreview.style.gridTemplateColumns = `repeat(${cabinetsHoriz}, 1fr)`;
-  cabinetPreview.style.gridTemplateRows = `repeat(${cabinetsVert}, 1fr)`;
+  cabinetPreview.className = 'grid gap-1'; // Tailwind grid container
+  cabinetPreview.style.gridTemplateColumns = `repeat(${cabinetsHoriz}, minmax(0, 1fr))`;
 
   for (let i = 0; i < totalCabinets; i++) {
     const div = document.createElement('div');
-    div.className = 'cabinet';
-    div.innerText = `Cabinet ${i + 1}`;
-    div.style.aspectRatio = `${cabinetW} / ${cabinetH}`; // Optional: for visual proportion
+    div.className = 'bg-blue-500 text-white text-xs font-semibold flex items-center justify-center rounded shadow aspect-square';
+    div.textContent = `#${i + 1}`;
     cabinetPreview.appendChild(div);
   }
 
   // Power calculation
-  const powerPerCabinet = 160;
+  const powerPerCabinet = 160; // in watts
   const totalPower = totalCabinets * powerPerCabinet;
 
   // Resolution tier
@@ -57,19 +56,21 @@ function calculate() {
     resolutionTier = '8K UHD';
   }
 
-  // Output results
+  // Display results
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = `
-    <h2>Results</h2>
-    <p><strong>Width:</strong> ${widthPx} px</p>
-    <p><strong>Height:</strong> ${heightPx} px</p>
-    <p><strong>Total Pixels:</strong> ${totalPixels.toLocaleString()}</p>
-    <p><strong>Aspect Ratio:</strong> ${aspectRatio}</p>
-    <hr/>
-    <p><strong>Cabinets (WxH):</strong> ${cabinetW}mm x ${cabinetH}mm</p>
-    <p><strong>Cabinet Layout:</strong> ${cabinetsHoriz} x ${cabinetsVert}</p>
-    <p><strong>Total Cabinets:</strong> ${totalCabinets}</p>
-    <p><strong>Estimated Power Consumption:</strong> ${totalPower} W</p>
-    <p><strong>Resolution Tier:</strong> ${resolutionTier}</p>
+    <h2 class="text-xl font-semibold mb-2">Results</h2>
+    <ul class="space-y-1 text-sm">
+      <li><strong>Width:</strong> ${widthPx} px</li>
+      <li><strong>Height:</strong> ${heightPx} px</li>
+      <li><strong>Total Pixels:</strong> ${totalPixels.toLocaleString()}</li>
+      <li><strong>Aspect Ratio:</strong> ${aspectRatio}</li>
+      <hr class="my-2"/>
+      <li><strong>Cabinets (WxH):</strong> ${cabinetW}mm x ${cabinetH}mm</li>
+      <li><strong>Cabinet Layout:</strong> ${cabinetsHoriz} x ${cabinetsVert}</li>
+      <li><strong>Total Cabinets:</strong> ${totalCabinets}</li>
+      <li><strong>Estimated Power Consumption:</strong> ${totalPower} W</li>
+      <li><strong>Resolution Tier:</strong> ${resolutionTier}</li>
+    </ul>
   `;
 }
