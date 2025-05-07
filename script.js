@@ -1,46 +1,49 @@
-function calculate() { 
+function calculate() {
   const widthFt = parseFloat(document.getElementById('width').value);
   const heightFt = parseFloat(document.getElementById('height').value);
   const pixelPitch = parseFloat(document.getElementById('pixelPitch').value);
   const cabinetSize = document.getElementById('cabinetSize').value;
 
-  if (!widthFt || !heightFt) {
-    alert("Please enter both width and height.");
+  if (!widthFt || !heightFt || !pixelPitch || !cabinetSize) {
+    alert("Please fill in all fields (Width, Height, Pixel Pitch, Cabinet Size).");
     return;
   }
 
+  // Convert feet to millimeters
   const widthMm = widthFt * 304.8;
   const heightMm = heightFt * 304.8;
 
+  // Pixel calculations
   const widthPx = Math.floor(widthMm / pixelPitch);
   const heightPx = Math.floor(heightMm / pixelPitch);
   const totalPixels = widthPx * heightPx;
-
   const aspectRatio = `${widthPx}:${heightPx}`;
 
+  // Cabinet layout calculations
   const [cabinetW, cabinetH] = cabinetSize.split('x').map(Number);
   const cabinetsHoriz = Math.ceil(widthMm / cabinetW);
   const cabinetsVert = Math.ceil(heightMm / cabinetH);
   const totalCabinets = cabinetsHoriz * cabinetsVert;
-  // Draw cabinet grid
-const cabinetPreview = document.getElementById('cabinetPreview');
-cabinetPreview.innerHTML = ''; // Clear previous
-cabinetPreview.style.gridTemplateColumns = `repeat(${cabinetsHoriz}, 1fr)`;
-cabinetPreview.style.gridTemplateRows = `repeat(${cabinetsVert}, 1fr)`;
 
-for (let i = 0; i < cabinetsVert * cabinetsHoriz; i++) {
+  // Preview Grid
+  const cabinetPreview = document.getElementById('cabinetPreview');
+  cabinetPreview.innerHTML = '';
+  cabinetPreview.style.gridTemplateColumns = `repeat(${cabinetsHoriz}, 1fr)`;
+  cabinetPreview.style.gridTemplateRows = `repeat(${cabinetsVert}, 1fr)`;
+
+  for (let i = 0; i < totalCabinets; i++) {
     const div = document.createElement('div');
     div.className = 'cabinet';
     div.innerText = `Cabinet ${i + 1}`;
+    div.style.aspectRatio = `${cabinetW} / ${cabinetH}`; // Optional: for visual proportion
     cabinetPreview.appendChild(div);
-}
+  }
 
-
-  // Estimate power consumption
-  const powerPerCabinet = 160; // in Watts
+  // Power calculation
+  const powerPerCabinet = 160;
   const totalPower = totalCabinets * powerPerCabinet;
 
-  // Determine resolution tier
+  // Resolution tier
   let resolutionTier = '';
   if (totalPixels < 921600) {
     resolutionTier = 'SD (Standard Definition)';
@@ -54,6 +57,7 @@ for (let i = 0; i < cabinetsVert * cabinetsHoriz; i++) {
     resolutionTier = '8K UHD';
   }
 
+  // Output results
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = `
     <h2>Results</h2>
