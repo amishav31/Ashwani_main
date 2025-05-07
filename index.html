@@ -6,6 +6,17 @@
   <title>LED Wall Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/heroicons@2.0.13/dist/24/outline.js"></script>
+  <style>
+    .cabinet {
+      background-color: #3b82f6;
+      color: white;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.25rem;
+    }
+  </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans p-4 relative">
 
@@ -17,12 +28,12 @@
       <div class="space-y-4">
         <div>
           <label for="width" class="block font-medium">Width (ft):</label>
-          <input type="number" id="width" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <input type="number" id="width" class="w-full border rounded px-3 py-2" />
         </div>
 
         <div>
           <label for="height" class="block font-medium">Height (ft):</label>
-          <input type="number" id="height" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+          <input type="number" id="height" class="w-full border rounded px-3 py-2" />
         </div>
 
         <div>
@@ -58,7 +69,7 @@
 
         <div id="cabinetPreviewWrapper" class="border-t pt-4">
           <h3 class="text-lg font-semibold mb-2">Cabinet Layout Preview</h3>
-          <div id="cabinetPreview" class="grid gap-1"></div>
+          <div id="cabinetPreview" class="grid gap-1 border p-2 bg-black rounded" style="min-height: 150px;"></div>
         </div>
       </div>
     </div>
@@ -67,6 +78,62 @@
   <!-- Toast -->
   <div id="toast" class="fixed bottom-6 right-6 bg-red-500 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 z-50"></div>
 
-  <script src="script.js"></script>
+  <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.opacity = '1';
+      setTimeout(() => toast.style.opacity = '0', 3000);
+    }
+
+    function calculate() {
+      const widthFt = parseFloat(document.getElementById('width').value);
+      const heightFt = parseFloat(document.getElementById('height').value);
+      const pixelPitch = parseFloat(document.getElementById('pixelPitch').value);
+      const cabinetSize = document.getElementById('cabinetSize').value.split('x').map(Number);
+
+      if (isNaN(widthFt) || isNaN(heightFt) || widthFt <= 0 || heightFt <= 0) {
+        showToast("Please enter valid width and height.");
+        return;
+      }
+
+      // Convert feet to mm
+      const widthMm = widthFt * 304.8;
+      const heightMm = heightFt * 304.8;
+
+      // Cabinet dimensions
+      const cabW = cabinetSize[0];
+      const cabH = cabinetSize[1];
+
+      const cols = Math.floor(widthMm / cabW);
+      const rows = Math.floor(heightMm / cabH);
+
+      const resolutionW = Math.floor(widthMm / pixelPitch);
+      const resolutionH = Math.floor(heightMm / pixelPitch);
+
+      // Display results
+      const result = document.getElementById('result');
+      result.innerHTML = `
+        <p><strong>Resolution:</strong> ${resolutionW} × ${resolutionH} pixels</p>
+        <p><strong>Cabinet Grid:</strong> ${cols} (cols) × ${rows} (rows)</p>
+        <p><strong>Total Cabinets:</strong> ${cols * rows}</p>
+      `;
+      result.style.opacity = '1';
+
+      // Cabinet Grid Preview
+      const preview = document.getElementById('cabinetPreview');
+      preview.innerHTML = '';
+      preview.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const cab = document.createElement('div');
+          cab.className = 'cabinet';
+          cab.textContent = `C${r * cols + c + 1}`;
+          preview.appendChild(cab);
+        }
+      }
+    }
+  </script>
 </body>
 </html>
