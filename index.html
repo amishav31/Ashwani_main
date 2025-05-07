@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LED Calculator</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LED Wall Calculator</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
   <div class="container">
     <h1>LED Wall Calculator</h1>
-    
+
     <div class="form-section">
       <label>Width (ft): <input type="number" id="width" /></label>
       <label>Height (ft): <input type="number" id="height" /></label>
-      <label>Pixel Pitch (mm): 
+      <label>Pixel Pitch (mm):
         <select id="pixelPitch">
           <option value="1.5">1.5</option>
           <option value="2.5" selected>2.5</option>
           <option value="3.0">3.0</option>
         </select>
       </label>
+      <label>Cabinet Size (mm):
+        <select id="cabinetSize">
+          <option value="640x480" selected>640 x 480</option>
+          <option value="960x960">960 x 960</option>
+        </select>
+      </label>
       <button onclick="calculate()">Calculate</button>
     </div>
 
     <div class="result-section" id="result">
-      <!-- Results will be shown here -->
+      <!-- Results will appear here -->
     </div>
   </div>
 
