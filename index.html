@@ -4,40 +4,57 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LED Wall Calculator</title>
-  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="container">
-    <h1>LED Wall Calculator</h1>
+<body class="bg-gray-100 text-gray-800 font-sans p-4">
+  <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 space-y-6">
+    <h1 class="text-3xl font-bold text-center">LED Wall Calculator</h1>
 
-    <div class="form-section">
-      <label>Width (ft): <input type="number" id="width" /></label>
-      <label>Height (ft): <input type="number" id="height" /></label>
-      <label>Pixel Pitch (mm):
-        <select id="pixelPitch">
-          <option value="1.5">1.5</option>
-          <option value="2.5" selected>2.5</option>
-          <option value="3.0">3.0</option>
-        </select>
-      </label>
-      <label>Cabinet Size (mm):
-        <select id="cabinetSize">
-          <option value="640x480" selected>640 x 480</option>
-          <option value="960x960">960 x 960</option>
-        </select>
-      </label>
-      <button onclick="calculate()">Calculate</button>
-    </div>
+    <!-- Form Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="space-y-4">
+        <div>
+          <label for="width" class="block font-medium">Width (ft):</label>
+          <input type="number" id="width" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        </div>
 
-    <!-- Side-by-side layout starts here -->
-    <div class="result-layout">
-      <div class="result-info" id="result">
-        <!-- Results will appear here -->
+        <div>
+          <label for="height" class="block font-medium">Height (ft):</label>
+          <input type="number" id="height" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        </div>
+
+        <div>
+          <label for="pixelPitch" class="block font-medium">Pixel Pitch (mm):</label>
+          <select id="pixelPitch" class="w-full border rounded px-3 py-2">
+            <option value="1.5">1.5</option>
+            <option value="2.5" selected>2.5</option>
+            <option value="3.0">3.0</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="cabinetSize" class="block font-medium">Cabinet Size (mm):</label>
+          <select id="cabinetSize" class="w-full border rounded px-3 py-2">
+            <option value="640x480" selected>640 x 480</option>
+            <option value="960x960">960 x 960</option>
+          </select>
+        </div>
+
+        <button onclick="calculate()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+          Calculate
+        </button>
       </div>
 
-      <div id="cabinetPreviewWrapper">
-        <h3>Cabinet Layout Preview</h3>
-        <div id="cabinetPreview"></div>
+      <!-- Results + Preview -->
+      <div class="space-y-4">
+        <div id="result" class="bg-gray-50 border border-gray-300 p-4 rounded min-h-[100px]">
+          <!-- Results will appear here -->
+        </div>
+
+        <div id="cabinetPreviewWrapper" class="border-t pt-4">
+          <h3 class="text-lg font-semibold mb-2">Cabinet Layout Preview</h3>
+          <div id="cabinetPreview" class="flex flex-wrap gap-1"></div>
+        </div>
       </div>
     </div>
   </div>
