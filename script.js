@@ -22,6 +22,19 @@ function calculate() {
   const cabinetsHoriz = Math.ceil(widthMm / cabinetW);
   const cabinetsVert = Math.ceil(heightMm / cabinetH);
   const totalCabinets = cabinetsHoriz * cabinetsVert;
+  // Draw cabinet grid
+const cabinetPreview = document.getElementById('cabinetPreview');
+cabinetPreview.innerHTML = ''; // Clear previous
+cabinetPreview.style.gridTemplateColumns = `repeat(${cabinetsHoriz}, 1fr)`;
+cabinetPreview.style.gridTemplateRows = `repeat(${cabinetsVert}, 1fr)`;
+
+for (let i = 0; i < cabinetsVert * cabinetsHoriz; i++) {
+    const div = document.createElement('div');
+    div.className = 'cabinet';
+    div.innerText = `Cabinet ${i + 1}`;
+    cabinetPreview.appendChild(div);
+}
+
 
   // Estimate power consumption
   const powerPerCabinet = 160; // in Watts
