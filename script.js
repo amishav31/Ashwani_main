@@ -1,3 +1,15 @@
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.remove("opacity-0");
+  toast.classList.add("opacity-100");
+
+  setTimeout(() => {
+    toast.classList.remove("opacity-100");
+    toast.classList.add("opacity-0");
+  }, 3000);
+}
+
 function calculate() {
   const widthFt = parseFloat(document.getElementById('width').value);
   const heightFt = parseFloat(document.getElementById('height').value);
@@ -5,7 +17,7 @@ function calculate() {
   const cabinetSize = document.getElementById('cabinetSize').value;
 
   if (!widthFt || !heightFt || !pixelPitch || !cabinetSize) {
-    alert("Please fill in all fields (Width, Height, Pixel Pitch, Cabinet Size).");
+    showToast("Please fill in all fields (Width, Height, Pixel Pitch, Cabinet Size).");
     return;
   }
 
@@ -28,7 +40,7 @@ function calculate() {
   // Cabinet layout preview
   const cabinetPreview = document.getElementById('cabinetPreview');
   cabinetPreview.innerHTML = '';
-  cabinetPreview.className = 'grid gap-1'; // Tailwind grid container
+  cabinetPreview.className = 'grid gap-1';
   cabinetPreview.style.gridTemplateColumns = `repeat(${cabinetsHoriz}, minmax(0, 1fr))`;
 
   for (let i = 0; i < totalCabinets; i++) {
@@ -39,7 +51,7 @@ function calculate() {
   }
 
   // Power calculation
-  const powerPerCabinet = 160; // in watts
+  const powerPerCabinet = 160;
   const totalPower = totalCabinets * powerPerCabinet;
 
   // Resolution tier
@@ -56,8 +68,9 @@ function calculate() {
     resolutionTier = '8K UHD';
   }
 
-  // Display results
+  // Display results with fade-in animation
   const resultDiv = document.getElementById('result');
+  resultDiv.style.opacity = '0'; // reset
   resultDiv.innerHTML = `
     <h2 class="text-xl font-semibold mb-2">Results</h2>
     <ul class="space-y-1 text-sm">
@@ -73,4 +86,9 @@ function calculate() {
       <li><strong>Resolution Tier:</strong> ${resolutionTier}</li>
     </ul>
   `;
+
+  // Animate fade-in
+  setTimeout(() => {
+    resultDiv.style.opacity = '1';
+  }, 50);
 }
