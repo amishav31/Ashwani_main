@@ -1,9 +1,9 @@
 body {
-  @apply bg-gray-100 text-gray-800 m-0 p-8 font-sans;
+  @apply bg-gray-100 text-gray-800 m-0 p-6 sm:p-8 font-sans;
 }
 
 .container {
-  @apply max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-lg;
+  @apply max-w-5xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg;
 }
 
 .result-layout {
@@ -11,7 +11,7 @@ body {
 }
 
 .result-info {
-  @apply flex-1 min-w-[280px];
+  @apply flex-1 min-w-[280px] space-y-2;
 }
 
 #cabinetPreviewWrapper {
@@ -19,9 +19,9 @@ body {
 }
 
 #cabinetPreview {
-  @apply grid gap-1 bg-gray-200 p-2 rounded-md;
+  @apply grid gap-1 bg-gray-100 p-2 rounded-md border border-gray-300;
 }
 
 .cabinet {
-  @apply bg-blue-500 text-white border border-gray-300 flex items-center justify-center text-xs font-semibold rounded aspect-square;
+  @apply bg-blue-500 text-white border border-blue-700 flex items-center justify-center text-xs font-semibold rounded aspect-square shadow-sm transition duration-200 ease-in-out hover:bg-blue-600;
 }
