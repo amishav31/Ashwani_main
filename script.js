@@ -9,25 +9,20 @@ function calculate() {
     return;
   }
 
-  // Convert feet to millimeters
   const widthMm = widthFt * 304.8;
   const heightMm = heightFt * 304.8;
 
-  // Resolution calculation
   const widthPx = Math.floor(widthMm / pixelPitch);
   const heightPx = Math.floor(heightMm / pixelPitch);
   const totalPixels = widthPx * heightPx;
 
-  // Aspect Ratio (not simplified)
   const aspectRatio = `${widthPx}:${heightPx}`;
 
-  // Cabinet logic
   const [cabinetW, cabinetH] = cabinetSize.split('x').map(Number);
   const cabinetsHoriz = Math.ceil(widthMm / cabinetW);
   const cabinetsVert = Math.ceil(heightMm / cabinetH);
   const totalCabinets = cabinetsHoriz * cabinetsVert;
 
-  // Show results
   const resultDiv = document.getElementById('result');
   resultDiv.innerHTML = `
     <h2>Results</h2>
@@ -37,7 +32,7 @@ function calculate() {
     <p><strong>Aspect Ratio:</strong> ${aspectRatio}</p>
     <hr/>
     <p><strong>Cabinets (WxH):</strong> ${cabinetW}mm x ${cabinetH}mm</p>
-    <p><strong>Cabinet Layout:</strong> ${cabinetHoriz} x ${cabinetVert}</p>
+    <p><strong>Cabinet Layout:</strong> ${cabinetsHoriz} x ${cabinetsVert}</p>
     <p><strong>Total Cabinets:</strong> ${totalCabinets}</p>
   `;
 }
