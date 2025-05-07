@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LED Wall Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/heroicons@2.0.13/dist/24/outline.js"></script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans p-4">
+<body class="bg-gray-100 text-gray-800 font-sans p-4 relative">
+
   <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 space-y-6">
     <h1 class="text-3xl font-bold text-center">LED Wall Calculator</h1>
 
@@ -40,24 +42,30 @@
           </select>
         </div>
 
-        <button onclick="calculate()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        <button onclick="calculate()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2">
+            <use href="#calculator"/>
+          </svg>
           Calculate
         </button>
       </div>
 
       <!-- Results + Preview -->
       <div class="space-y-4">
-        <div id="result" class="bg-gray-50 border border-gray-300 p-4 rounded min-h-[100px]">
+        <div id="result" class="bg-gray-50 border border-gray-300 p-4 rounded min-h-[100px] opacity-0 transition-opacity duration-700">
           <!-- Results will appear here -->
         </div>
 
         <div id="cabinetPreviewWrapper" class="border-t pt-4">
           <h3 class="text-lg font-semibold mb-2">Cabinet Layout Preview</h3>
-          <div id="cabinetPreview" class="flex flex-wrap gap-1"></div>
+          <div id="cabinetPreview" class="grid gap-1"></div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 bg-red-500 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity duration-300 z-50"></div>
 
   <script src="script.js"></script>
 </body>
